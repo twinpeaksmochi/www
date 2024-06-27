@@ -27,21 +27,47 @@
      * Writes 'Hello world!' to a new message body.
      */
     function sayHello() {
-        Office.context.mailbox.item.body.setAsync(
-            "Hello world!",
-            {
-                coercionType: "html", // Write text as HTML
-            },
-
-            // Callback method to check that setAsync succeeded
-            function (asyncResult) {
-                if (asyncResult.status ==
-                    Office.AsyncResultStatus.Failed) {
-                    write(asyncResult.error.message);
+            /*
+            Office.context.mailbox.item.body.setAsync(
+                "Hello world!",
+                {
+                    coercionType: "html", // Write text as HTML
+                },
+    
+                // Callback method to check that setAsync succeeded
+                function (asyncResult) {
+                    if (asyncResult.status ==
+                        Office.AsyncResultStatus.Failed) {
+                        write(asyncResult.error.message);
+                    }
                 }
-            }
-        );
-    }
+            );
+            */
+
+            Office.context.mailbox.item.body.getAsync(Office.CoercionType.Html, function (result) {
+                if (result.status === Office.AsyncResultStatus.Succeeded) {
+                    // Current body content
+                    var currentBody = result.value;
+
+                    // New content to append
+                    var newContent = "<p>Secure With Material Security</p>";
+
+                    // Append the new content to the current body
+                    var updatedBody = currentBody + newContent;
+
+                    // Set the updated body content
+                    Office.context.mailbox.item.body.setAsync(updatedBody, { coercionType: Office.CoercionType.Html }, function (asyncResult) {
+                        if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+                            console.log("Body content updated successfully.");
+                        } else {
+                            console.error("Failed to update body content: " + asyncResult.error.message);
+                        }
+                    });
+                } else {
+                    console.error("Failed to get body content: " + result.error.message);
+                }
+            });
+        }
 
 </script>
 
